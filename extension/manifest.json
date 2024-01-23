@@ -4,12 +4,16 @@
   "name": "Basic Chrome Extension",
   "description": "This extension is for education purpose",
   "version": "1.0",
-  "permissions": ["cookies",
-  "https://notes.iut-nantes.univ-nantes.fr/",
+  "permissions": [
+    "cookies",
+  
+    "notifications",
+    "https://notes.iut-nantes.univ-nantes.fr/",
   "storage",
   "notifications"],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["background.js"
+  ],
     "persistent": false
   },
   "browser_action":{

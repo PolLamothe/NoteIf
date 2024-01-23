@@ -8,9 +8,3 @@ $('#notif').on('click', function() {
         body: "Nouvelle note dans la matière R101",
     });
 })
-
-$('#notif').on('click', function() {
-    let notif = new Notification('Vous avez une nouvelle note !', {
-        body: "Nouvelle note dans la matière R101",
-    });
-})

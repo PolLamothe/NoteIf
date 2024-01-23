@@ -1,32 +1,11 @@
 express = require('express');
-var axios = require('axios');
-app = express();
+const bodyParser = require('body-parser')//module qui sert a traiter les données json
+var fonction = require("./function/function.js");
+app = express()
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.json());
 
-function getNode(){
-    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
-    const headers = {
-    "Host": "notes.iut-nantes.univ-nantes.fr",
-    "Cookie": "PHPSESSID=SESSIONPHP",//a remplacer par le cookie de la session
-    "Content-Length": "0",
-    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
-}
-    const data = {};
-
-    // Envoi de la requête POST
-    axios.post(url, data, { headers })
-        .then(response => {
-            // Traitement de la réponse
-            console.log(response.data["relevé"]);
-        })
-        .catch(error => {
-            // Gestion des erreurs
-            console.error('Erreur lors de la requête:', error.message);
-        });
-}
-
-app.get('/', function(req, res) {
-    getNode();
-    res.send('Hello World!');
-})
+require('./function/get.js')(app,fonction);
+require('./function/post.js')(app,fonction);
 
 app.listen(3000)

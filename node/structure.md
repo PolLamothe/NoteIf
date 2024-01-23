@@ -1,6 +1,6 @@
 ### Ce fichier nous sert a stocker et mettre au point la structure JSON des données stockées
 
-**Structure stockage Client-SESSIONID** :
+**Structure stockage Client** :
 
 ```
 {

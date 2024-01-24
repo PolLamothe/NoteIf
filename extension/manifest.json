@@ -6,7 +6,6 @@
   "version": "1.0",
   "permissions": [
     "cookies",
-  
     "notifications",
     "https://notes.iut-nantes.univ-nantes.fr/",
   "storage",

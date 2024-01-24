@@ -6,6 +6,8 @@
 {
 	ClientID : string
 	NouvelleNote : bool
+    NomPromo : string
+    NuméroGroupe : int
 }
 ```
 

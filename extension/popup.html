@@ -4,11 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="./popup.css" rel="stylesheet">
     <title>Document</title>
 </head>
 <body>
-    <button id="button">Chercher NOTE</button>
-    <button id="notif">Notification</button>
-    <script src="./popup.js"></script>
+    <div id="GlobalDiv">
+        <button id="notif">Notification</button>
+    </div>
+    <div id="NotRegisteredDiv" style="display: none;">
+        <p id="NotRegisteredText">Vous n'êtes pas enregistré</p>
+        <input placeholder="Nom de votre pomo ex:INFO1" id="PromoInput">
+        <input placeholder="Numéro de votre groupe de TD" id="TDInput">
+        <button id="registerValidate">M'enregistrer</button>
+    </div>
+    <input placeholder="Vous pouvez entrer vos SESSIONID ici" id="SESSIONIDInput" class="SESSIONIDSend">
+    <button class="SESSIONIDSend" id="SESSIONIDButton">Valider</button>
+
+<script src="./popup.js"></script>
 </body>
 </html>

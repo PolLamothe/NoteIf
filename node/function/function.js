@@ -1,5 +1,6 @@
 var axios = require("axios")
 const MongoClient = require('mongodb').MongoClient
+const Mongo = require('mongodb')
 
 const DBName = 'NoteIf'
 
@@ -36,7 +37,7 @@ async function createUser(NomPromo,NuméroGroupe){
     }
     var client = await getClient()
     var collection = client.db(DBName).collection('Client')
-    var objectId = (await collection.insertOne({})).insertedId
+    var objectId = (await collection.insertOne({NomPromo : NomPromo,NuméroGroupe : NuméroGroupe})).insertedId
     if (!await doesTDExist(NomPromo,NuméroGroupe)){
         await createTD(NomPromo,NuméroGroupe)
     }
@@ -77,10 +78,39 @@ async function addUser(NomPromo,NuméroGroupe,ClientID){
     await collection.updateOne({NomPromo: NomPromo, NuméroGroupe: NuméroGroupe},{$set: {Client: allUser}})
 }
 
+async function DoesUserExist(id){
+    if(id == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var objectID = id
+    var result = await collection.findOne({"_id": objectID})
+    if (result != undefined){
+        return true
+    }
+    return false
+}
+
+async function InsertSessionID(ClientID,SESSIONID){
+    if (ClientID == undefined || SESSIONID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    var collection = client.db(DBName).collection('TD')
+    result = await collection.findOne({"NomPromo" : result.NomPromo, "NuméroGroupe" : result.NuméroGroupe})
+    result.AllSESSIONID[ClientID] = SESSIONID
+    await collection.updateOne({"NomPromo" : result.NomPromo, "NuméroGroupe" : result.NuméroGroupe},{$set: {"AllSESSIONID": result.AllSESSIONID}})
+}
+
 module.exports = {
     getNode,
     createUser,
     doesTDExist,
     createTD,
     addUser,
+    DoesUserExist,
+    InsertSessionID,
 }

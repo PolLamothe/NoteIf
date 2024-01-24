@@ -1,0 +1,10 @@
+#NotRegisteredText{
+    width: max-content;
+    color: red;
+}
+#NotRegisteredDiv{
+    text-align: center;
+}
+#SESSIONIDDiv{
+    display: none;
+}

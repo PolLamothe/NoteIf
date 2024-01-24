@@ -1,6 +1,21 @@
 module.exports = function (app,fonction) {
-    app.get('/', function(req, res) {
-        fonction.getNode()
-        res.send('Hello World!');
+    app.get('/doesThisUserExist/:ID',async function(req,res){
+        try{
+            res.setHeader("Access-Control-Allow-Origin", "*")
+            res.send(await fonction.DoesUserExist(req.params.ID))
+        }catch(e){
+            console.log(e)
+            res.send(false)
+        }
+    })
+    app.get('/getGrade/:ID',async function(req,res){
+        try{
+            res.setHeader("Access-Control-Allow-Origin", "*")
+            await fonction.StoreNewGrade(req.params.ID)
+            res.send(await fonction.GetGrade(req.params.ID))
+        }catch(e){
+            console.log(e)
+            res.send(false)
+        }
     })
 }

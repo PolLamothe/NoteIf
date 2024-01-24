@@ -1,6 +1,7 @@
 var axios = require("axios")
 const MongoClient = require('mongodb').MongoClient
 const Mongo = require('mongodb')
+const { createHash } = require('crypto')
 
 const DBName = 'NoteIf'
 
@@ -118,6 +119,64 @@ async function RemoveSessionID(ClientID){
     await collection.updateOne({"NomPromo" : result.NomPromo, "NuméroGroupe" : result.NuméroGroupe},{$set: {"AllSESSIONID": result.AllSESSIONID}})
 }
 
+async function GetGrade(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var group = await GetUserTDAndPromo(ClientID)
+    var result = (await collection.findOne({"NomPromo" : group.NomPromo, "NuméroGroupe" : group.NuméroGroupe})).AllSESSIONID[ClientID]
+    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
+    const headers = {
+    "Host": "notes.iut-nantes.univ-nantes.fr",
+    "Cookie": "PHPSESSID="+result,//a remplacer par le cookie de la session
+    "Content-Length": "0",
+    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
+    }
+    const data = {}
+    var moyenne
+    try {
+        moyenne = (await axios.post(url, data, { headers })).data["relevé"]["semestre"].notes.value
+    }catch(e){
+        await RemoveSessionID(ClientID)
+        return false
+    }
+    return createHash('sha256').update(moyenne).digest('hex');
+}
+
+async function GetUserTDAndPromo(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    return {"NomPromo": result.NomPromo, "NuméroGroupe": result.NuméroGroupe}
+}
+
+async function StoreNewGrade(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var group = await GetUserTDAndPromo(ClientID)
+    group = await GetTDData(group.NomPromo,group.NuméroGroupe)
+    group.AllNoteHash[ClientID] = await GetGrade(ClientID)
+    await collection.updateOne({"NomPromo" : group.NomPromo, "NuméroGroupe" : group.NuméroGroupe},{$set: {"AllNoteHash": group.AllNoteHash}})
+}
+
+async function GetTDData(NomPromo,NuméroGroupe){
+    if (NomPromo == undefined || NuméroGroupe == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.findOne({NomPromo: NomPromo, NuméroGroupe: NuméroGroupe})
+    return result
+}
+
 module.exports = {
     getNode,
     createUser,
@@ -127,4 +186,8 @@ module.exports = {
     DoesUserExist,
     InsertSessionID,
     RemoveSessionID,
+    GetUserTDAndPromo,
+    GetGrade,
+    StoreNewGrade,
+    GetTDData,
 }

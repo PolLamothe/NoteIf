@@ -1,23 +1,25 @@
 {
   "manifest_version": 2,
 
-  "name": "Basic Chrome Extension",
-  "description": "This extension is for education purpose",
+  "name": "Note If",
+  "description": "NoteIf permet aux étudiants de l'IUT de nantes à être averti à chaque nouvelle note publiée sur leur bulletin",
   "version": "1.0",
   "permissions": [
     "cookies",
-  
+    "storage",
     "notifications",
-    "https://notes.iut-nantes.univ-nantes.fr/",
-  "storage",
-  "notifications"],
-  "background": {
-    "scripts": ["background.js"
+    "https://notes.iut-nantes.univ-nantes.fr/"
   ],
+  "background": {
+    "scripts": ["background.js"],
     "persistent": false
   },
   "browser_action":{
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon" : "img/icon_32.png"
   },
-  "content_security_policy": "script-src 'self' https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js; object-src 'self'",
+  "icons": {
+    "128" : "img/icon_128.png"
+  }
 }

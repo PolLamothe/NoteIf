@@ -36,6 +36,12 @@ $("#DeleteSESSIONIDButton").on('click',async function(){
     deleteSessionID(await getLocalID())
 })
 
+$('#SESSIONIDAutomaticButton').on('click',async function(){
+    chrome.cookies.get({"url":"https://notes.iut-nantes.univ-nantes.fr/","name":"PHPSESSID"},async function(cookie) {
+        sendSESSIONID(await getLocalID(),cookie.value)
+    })
+})
+
 const IP = "http://localhost:3000"
 
 async function UpdateClientID(){

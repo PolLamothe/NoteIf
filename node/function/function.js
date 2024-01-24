@@ -105,6 +105,19 @@ async function InsertSessionID(ClientID,SESSIONID){
     await collection.updateOne({"NomPromo" : result.NomPromo, "NuméroGroupe" : result.NuméroGroupe},{$set: {"AllSESSIONID": result.AllSESSIONID}})
 }
 
+async function RemoveSessionID(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    var collection = client.db(DBName).collection('TD')
+    result = await collection.findOne({"NomPromo" : result.NomPromo, "NuméroGroupe" : result.NuméroGroupe})
+    delete result.AllSESSIONID[ClientID]
+    await collection.updateOne({"NomPromo" : result.NomPromo, "NuméroGroupe" : result.NuméroGroupe},{$set: {"AllSESSIONID": result.AllSESSIONID}})
+}
+
 module.exports = {
     getNode,
     createUser,
@@ -113,4 +126,5 @@ module.exports = {
     addUser,
     DoesUserExist,
     InsertSessionID,
+    RemoveSessionID,
 }

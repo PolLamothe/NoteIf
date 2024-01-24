@@ -9,10 +9,19 @@ module.exports = function (app,fonction) {
         }
     })
     app.post('/sendSessionID',async function(req,res){
-        console.log("requete reçue")
         try{
             res.setHeader("Access-Control-Allow-Origin", "*")
             await fonction.InsertSessionID(req.body.ClientID,req.body.SESSIONID)
+            res.send(true)
+        }catch(e){
+            console.log(e)
+            res.send(false)
+        }
+    })
+    app.post('/removeSessionID',async function(req,res){
+        try{
+            res.setHeader("Access-Control-Allow-Origin", "*")
+            await fonction.RemoveSessionID(req.body.ClientID)
             res.send(true)
         }catch(e){
             console.log(e)

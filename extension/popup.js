@@ -27,10 +27,13 @@ $('#SESSIONIDButton').on('click',async function(){
     if($('#SESSIONIDInput').val()==""){
         alert("Veuillez remplir tout les champs")
     }else{
-        chrome.storage.local.get('id',(result)=>{
-            sendSESSIONID(result.id,$('#SESSIONIDInput').val())
-        })
+        sendSESSIONID(await getLocalID(),$('#SESSIONIDInput').val())
     }
+})
+
+
+$("#DeleteSESSIONIDButton").on('click',async function(){
+    deleteSessionID(await getLocalID())
 })
 
 const IP = "http://localhost:3000"
@@ -43,40 +46,48 @@ async function UpdateClientID(){
         }else{
             $('#GlobalDiv').css('display','inherit')
             $('#NotRegisteredDiv').css('display','none')
-            if (isIDValid(result.id)){
-            }else{
+            if (!isIDValid(result.id)){
                 chrome.storage.local.clear()
             }
         }
     })
-    await UpdateSESSIONID()
 }
 
-var LocalId = new Promise((resolve,reject)=>{
-    chrome.storage.local.get('id',(result)=>{
-        resolve(result.id)
-    })
-})
+UpdateClientID()
+UpdateSESSIONID()
 
-var LocalsessionID = new Promise((resolve,reject)=>{
-    chrome.storage.local.get('sessionID',(result1)=>{
-        resolve (result1.sessionID)
+async function getLocalID(){
+    var LocalId = new Promise((resolve,reject)=>{
+        chrome.storage.local.get('id',(result)=>{
+            resolve(result.id)
+        })
     })
-})
+    return await LocalId
+}
+
+async function getLocalSESSIONID(){
+    var LocalsessionID = new Promise((resolve,reject)=>{
+        chrome.storage.local.get('sessionID',(result1)=>{
+            resolve (result1.sessionID)
+        })
+    })
+    return await LocalsessionID
+}
+
 
 async function UpdateSESSIONID(){ 
-    var sessionID = await LocalsessionID
-    var Id = await LocalId
-    console.log(Id,sessionID)
+    var sessionID = await getLocalSESSIONID()
+    var Id = await getLocalID()
+    console.log(sessionID,Id)
     if (sessionID == undefined && Id != undefined){
-        $(".SESSIONIDSend").css('display','inherit')
+        $("#SESSIONIDDiv").css('display','inherit')
+        $('#DeleteSESSIONIDButton').css('display','none')
     }else{
-        $(".SESSIONIDSend").css('display','none')
+        $("#SESSIONIDDiv").css('display','none')
+        $('#DeleteSESSIONIDButton').css('display','inherit')
     }
 }
 
-UpdateSESSIONID()
-UpdateClientID()
 
 async function getNewID(Promo,TD){
     var response = await fetch(IP+"/createUser", {
@@ -101,7 +112,6 @@ async function isIDValid(id){
 }
 
 async function sendSESSIONID(ClientID,SESSIONID){
-    console.log("j'envoie")
     var response = await fetch(IP+"/sendSessionID", {
         method: "POST",
         headers: {
@@ -110,12 +120,32 @@ async function sendSESSIONID(ClientID,SESSIONID){
         body: JSON.stringify({
             "ClientID": ClientID,
             "SESSIONID": SESSIONID})
-        });
-        response = await response.json()
-        if (response == true){
-            chrome.storage.local.set({'sessionID': SESSIONID})
-            UpdateSESSIONID()
-        }else{
-            alert("Une erreur est survenue")
-        }
+    });
+    response = await response.json()
+    console.log(response)
+    if (response == true){
+        chrome.storage.local.set({'sessionID': SESSIONID})
+        UpdateSESSIONID()
+    }else{
+        alert("Une erreur est survenue")
+    }
+
+}
+
+async function deleteSessionID(ClientID){
+    var response = await fetch(IP+"/removeSessionID", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "ClientID": ClientID})
+    });
+    response = await response.json()
+    if (response == true){
+        await chrome.storage.local.remove('sessionID')
+        UpdateSESSIONID()
+    }else{
+        alert("Une erreur est survenue")
+    }
 }

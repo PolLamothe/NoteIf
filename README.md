@@ -1,5 +1,5 @@
 
-<div style="text-align: center;">
+<div align="center">
 
 ![Note If { }](extension/img/logo_noteIf_banner.png)
 

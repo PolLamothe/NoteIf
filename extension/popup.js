@@ -4,8 +4,8 @@ $('#button').on('click', function() {
     })})
 
 $('#notif').on('click', function() {
-    let notif = new Notification('Vous avez une nouvelle note !', {
-        body: "Nouvelle note dans la matière R101",
+    let notif = new Notification('Note If : Vous avez une nouvelle note !', {
+        icon: 'img/icon_128.png',
     });
 })
 

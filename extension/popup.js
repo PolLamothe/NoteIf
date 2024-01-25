@@ -1,3 +1,43 @@
+class Tabs {
+    constructor(tabsList, indicator) {
+        this.tabsList = tabsList
+        this.indicator = indicator
+        this.activeTab = tabsList[0]
+        this.activeTab[0].addClass("active")
+        this.tabsList.forEach(tab => {
+            if (tab !== this.activeTab) {
+                tab[2].css("display", "none")
+            }
+        })
+    }
+    changeActive(tab) {
+        if (this.activeTab !== tab) {
+            this.activeTab[0].removeClass("active")
+            this.activeTab[2].css("display", "none")
+            this.activeTab = tab
+            this.activeTab[0].addClass("active")
+            this.activeTab[2].css("display", "block")
+            this.indicator.css("margin-left", tab[1])
+        }
+    }
+    setListener() {
+        this.tabsList.forEach(tab =>  {
+            tab[0].on('click', () => {
+                this.changeActive(tab)
+            })
+        })
+    }
+}
+
+let navList = [
+    [$('#notifications'), "0", $('#notifTab')],
+    [$('#configuration'), "49%", $('#configTab')]
+]
+let nav = new Tabs(navList, $('#indicator'))
+nav.setListener()
+
+
+
 $('#notif').on('click', function() {
     let notif = new Notification('Note If : Vous avez une nouvelle note !', {
         icon: 'img/icon_128.png',

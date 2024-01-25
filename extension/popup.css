@@ -11,14 +11,39 @@ body {
     font-family: "Roboto Flex", Arial, sans-serif;
 }
 
-.header {
-    border-bottom: solid 1px var(--main);
-}
-
 .header img {
-    margin: 12px 0 8px 12px;
+    margin: 12px 0 0 12px;
     height: 39px;
     width: auto;
+}
+.header nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.tab {
+    flex-grow: 1;
+    text-align: center;
+    cursor: pointer;
+}
+.tab:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+.tab p {
+    font-weight: 700;
+}
+.tab_bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-left: 0;
+    width: 50%;
+    height: 2px;
+    border-radius: 50px;
+    background: var(--main);
+    transition: margin-left 0.4s ease-in-out;
 }
 
 footer {

@@ -8,18 +8,30 @@
     <title>NoteIf</title>
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <img src="img/logo_noteIf_banner_transparent.png" alt="Note If { }">
-    </div>
+        <nav>
+            <div class="tab" id="notifications">
+                <p>Notifications</p>
+            </div>
+            <div class="tab" id="configuration">
+                <p>Configuration</p>
+            </div>
+            <span class="tab_bar" id="indicator"></span>
+        </nav>
+    </header>
     <main>
-        <div id="GlobalDiv">
-            <button id="notif" class="btn">Notification</button>
+        <div id="notifTab">
+            <p class="empty">Aucune notification</p>
         </div>
-        <div id="NotRegisteredDiv" style="display: none;" class="flex__col">
-            <p id="NotRegisteredText">Vous n'êtes pas enregistré</p>
-            <input placeholder="Nom de votre pomo ex:INFO1" id="PromoInput">
-            <input placeholder="Numéro de votre groupe de TD" id="TDInput">
-            <button id="registerValidate" class="btn">M'enregistrer</button>
+        <div id="configTab">
+            <p>Configuration</p>
+            <div id="NotRegisteredDiv" style="display: none;" class="flex__col">
+                <p id="NotRegisteredText">Vous n'êtes pas enregistré</p>
+                <input placeholder="Nom de votre pomo ex:INFO1" id="PromoInput">
+                <input placeholder="Numéro de votre groupe de TD" id="TDInput">
+                <button id="registerValidate" class="btn">M'enregistrer</button>
+            </div>
         </div>
     </main>
     <footer>

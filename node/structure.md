@@ -8,6 +8,13 @@
 	NouvelleNote : bool
     NomPromo : string
     NuméroGroupe : int
+    notification : {
+        endpoint : string
+        keys: {
+            p256dh: 'BDCz2o7XDdOml-LNUt76vodRyuoUZ5hvKaPFwOAUanr5ofdoYfKDQdPdAz_S1Lae8-1l2RGn55YGiZ_YYcnlISE',
+            auth: 'J3YSejvZnWWtDee1Ng8yBw'
+        }
+    }
 }
 ```
 

@@ -33,3 +33,45 @@ async function getLocalID(){
     })
     return await LocalId
 }
+
+requestNotificationPermission()
+
+async function requestNotificationPermission(){
+    console.log('requestNotificationPermission')
+    if ('Notification' in window && navigator.serviceWorker) {
+        Notification.requestPermission().then(async (permission) => {
+        if (permission === 'granted') {
+            await subscribeToPushNotifications()
+        }
+        });
+    }
+};
+
+async function subscribeToPushNotifications(){
+    console.log('subscribeToPushNotifications')
+    if (navigator.serviceWorker) {
+        console.log('Service worker dans le Browser')
+        navigator.serviceWorker.ready.then((registration) => {
+            console.log('le service worker est ready')
+        registration.pushManager
+            .subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: "BIqB-A5ylsWSFARgxJtEdrGy8-gXjzVOG162fPG5WZjz4EYGH_13ytbogRDTnoids3yB9AW9n1g8n224mQpYKgo",
+            })
+            .then(async (sub) => {
+                console.log('starting function')
+                var response = await fetch(IP+"/receiveWebPushData",{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "PushSubscription": sub,
+                        "ClientID": await getLocalID()})
+                    })
+                })
+            .catch((error) => {
+            console.error('Erreur lors de l\'abonnement aux notifications push:', error);
+            })
+        })
+}}

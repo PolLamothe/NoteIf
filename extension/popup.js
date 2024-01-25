@@ -1,9 +1,3 @@
-$('#notif').on('click', function() {
-    let notif = new Notification('Note If : Vous avez une nouvelle note !', {
-        icon: 'img/icon_128.png',
-    });
-})
-
 $('#registerValidate').on('click', async function() {
     if ($('#PromoInput').val() == "" || $('#TDInput').val() == ""){
         alert("Veuillez remplir tout les champs")

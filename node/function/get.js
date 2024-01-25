@@ -18,4 +18,13 @@ module.exports = function (app,fonction) {
             res.send(false)
         }
     })
+    app.get('/:ID',async function(req,res){
+        try{
+            await fonction.SendNotif(req.params.ID)
+            res.send(true)
+        }catch(e){
+            console.log(e)  
+            res.send(false)
+        }
+    })
 }

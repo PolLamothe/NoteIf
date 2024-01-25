@@ -18,4 +18,15 @@ module.exports = function (app,fonction) {
             res.send(false)
         }
     })
+    app.post('/receiveWebPushData',async function(req,res){
+        try{
+            res.setHeader("Access-Control-Allow-Origin", "*")
+            console.log(req.body)
+            fonction.AddNotifData(req.body.ClientID,req.body.PushSubscription.endpoint,req.body.PushSubscription.keys)
+            res.send(true)
+        }catch(e){
+            console.log(e)
+            res.send(false)
+        }
+    })
 }

@@ -2,6 +2,13 @@ var axios = require("axios")
 const MongoClient = require('mongodb').MongoClient
 const Mongo = require('mongodb')
 const { createHash } = require('crypto')
+const webpush = require('web-push')
+
+webpush.setVapidDetails(
+    'mailto:',
+    "BIqB-A5ylsWSFARgxJtEdrGy8-gXjzVOG162fPG5WZjz4EYGH_13ytbogRDTnoids3yB9AW9n1g8n224mQpYKgo",
+    "QgvoUFJgkeRHd4hl_s2YTPZmT6Ga0U1U1-q7seEl9PM"
+  );
 
 const DBName = 'NoteIf'
 
@@ -150,6 +157,30 @@ async function GetTDData(NomPromo,NuméroGroupe){
     return result
 }
 
+async function AddNotifData(ClientID,endpoint,keys){
+    if (ClientID == undefined || endpoint == undefined || keys == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    await collection.updateOne({"_id" : new Mongo.ObjectId(ClientID)},{$set: {"notification":{"endpoint": endpoint, "keys": keys}}})
+}
+
+async function SendNotif(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    result = result.notification
+    const pushSubscription = {
+        endpoint: result.endpoint,
+        keys: result.keys
+    }
+    webpush.sendNotification(pushSubscription)
+}
+
 module.exports = {
     getNode,
     createUser,
@@ -161,4 +192,6 @@ module.exports = {
     GetGrade,
     StoreNewGrade,
     GetTDData,
+    AddNotifData,
+    SendNotif,
 }

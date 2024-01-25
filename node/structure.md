@@ -21,9 +21,6 @@ NouvelleNote sert a savoir si l'utilisateur a pris conaissance de l'ajout d'une 
 	NomPromo : string
 	NuméroGroupe : int
 	Client : [ClientID]
-    AllSESSIONID : {
-        ClientID : SESSIONID
-    }
     AllNoteHash : {
         SESSIONID : NoteHash    
     }

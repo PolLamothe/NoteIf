@@ -8,7 +8,9 @@
     "cookies",
     "storage",
     "notifications",
-    "https://notes.iut-nantes.univ-nantes.fr/"
+    "https://notes.iut-nantes.univ-nantes.fr/",
+    "webNavigation", 
+    "activeTab"
   ],
   "background": {
     "scripts": ["background.js"],

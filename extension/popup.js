@@ -1,8 +1,3 @@
-$('#button').on('click', function() {
-    chrome.cookies.get({"url":"https://notes.iut-nantes.univ-nantes.fr/","name":"PHPSESSID"}, function(cookie) {
-        console.log(cookie.value)
-    })})
-
 $('#notif').on('click', function() {
     let notif = new Notification('Note If : Vous avez une nouvelle note !', {
         icon: 'img/icon_128.png',
@@ -23,25 +18,6 @@ $('#registerValidate').on('click', async function() {
     }
 })
 
-$('#SESSIONIDButton').on('click',async function(){
-    if($('#SESSIONIDInput').val()==""){
-        alert("Veuillez remplir tout les champs")
-    }else{
-        sendSESSIONID(await getLocalID(),$('#SESSIONIDInput').val())
-    }
-})
-
-
-$("#DeleteSESSIONIDButton").on('click',async function(){
-    deleteSessionID(await getLocalID())
-})
-
-$('#SESSIONIDAutomaticButton').on('click',async function(){
-    chrome.cookies.get({"url":"https://notes.iut-nantes.univ-nantes.fr/","name":"PHPSESSID"},async function(cookie) {
-        sendSESSIONID(await getLocalID(),cookie.value)
-    })
-})
-
 const IP = "http://localhost:3000"
 
 async function UpdateClientID(){
@@ -60,7 +36,6 @@ async function UpdateClientID(){
 }
 
 UpdateClientID()
-UpdateSESSIONID()
 
 async function getLocalID(){
     var LocalId = new Promise((resolve,reject)=>{
@@ -69,29 +44,6 @@ async function getLocalID(){
         })
     })
     return await LocalId
-}
-
-async function getLocalSESSIONID(){
-    var LocalsessionID = new Promise((resolve,reject)=>{
-        chrome.storage.local.get('sessionID',(result1)=>{
-            resolve (result1.sessionID)
-        })
-    })
-    return await LocalsessionID
-}
-
-
-async function UpdateSESSIONID(){ 
-    var sessionID = await getLocalSESSIONID()
-    var Id = await getLocalID()
-    console.log(sessionID,Id)
-    if (sessionID == undefined && Id != undefined){
-        $("#SESSIONIDDiv").css('display','inherit')
-        $('#DeleteSESSIONIDButton').css('display','none')
-    }else{
-        $("#SESSIONIDDiv").css('display','none')
-        $('#DeleteSESSIONIDButton').css('display','inherit')
-    }
 }
 
 
@@ -115,43 +67,4 @@ async function isIDValid(id){
         method: "GET"})
         response = await response.json()
         return response
-}
-
-async function sendSESSIONID(ClientID,SESSIONID){
-    var response = await fetch(IP+"/sendSessionID", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            "ClientID": ClientID,
-            "SESSIONID": SESSIONID})
-    });
-    response = await response.json()
-    console.log(response)
-    if (response == true){
-        chrome.storage.local.set({'sessionID': SESSIONID})
-        UpdateSESSIONID()
-    }else{
-        alert("Une erreur est survenue")
-    }
-
-}
-
-async function deleteSessionID(ClientID){
-    var response = await fetch(IP+"/removeSessionID", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            "ClientID": ClientID})
-    });
-    response = await response.json()
-    if (response == true){
-        await chrome.storage.local.remove('sessionID')
-        UpdateSESSIONID()
-    }else{
-        alert("Une erreur est survenue")
-    }
 }

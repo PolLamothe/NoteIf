@@ -3,11 +3,12 @@ const MongoClient = require('mongodb').MongoClient
 const Mongo = require('mongodb')
 const { createHash } = require('crypto')
 const webpush = require('web-push')
+var vapidKey = require("./vapidKey.js")
 
 webpush.setVapidDetails(
     'mailto:',
-    "BIqB-A5ylsWSFARgxJtEdrGy8-gXjzVOG162fPG5WZjz4EYGH_13ytbogRDTnoids3yB9AW9n1g8n224mQpYKgo",
-    "QgvoUFJgkeRHd4hl_s2YTPZmT6Ga0U1U1-q7seEl9PM"
+    "BFiJK1S0uoKcKLzesQYlJ6HBC9OQ0GdKdSnefZmSsaA0FjkfGyItKSuSTvngSpVRcXmS--0tzSlNhi_YzsgaJIU",
+    vapidKey.privateKey
   );
 
 const DBName = 'NoteIf'

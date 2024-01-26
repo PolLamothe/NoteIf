@@ -11,16 +11,19 @@
     notification : {
         endpoint : string
         keys: {
-            p256dh: 'BDCz2o7XDdOml-LNUt76vodRyuoUZ5hvKaPFwOAUanr5ofdoYfKDQdPdAz_S1Lae8-1l2RGn55YGiZ_YYcnlISE',
-            auth: 'J3YSejvZnWWtDee1Ng8yBw'
+            p256dh: string,
+            auth: string
         }
     }
+    SessionNumber : string
 }
 ```
 
 Le ClientID est une chaine de caractère unique servant a identifier chaque utilisateur
 
 NouvelleNote sert a savoir si l'utilisateur a pris conaissance de l'ajout d'une nouvelle note
+
+SessionNumber est le numéro étudiant de l'utilisateur hashé en SHA-256, afin de préserver l'anonymat, cette donnée nous servira a vérifier que la connection qui vient d'être effectuée provient du bonne utilisateur
 
 **Structure stockage Groupe de TD** :
 ```

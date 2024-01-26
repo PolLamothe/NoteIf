@@ -101,8 +101,20 @@ async function DoesUserExist(id){
     return false
 }
 
+async function getSessionNumber(SESSIONID){
+    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
+    const headers = {
+    "Host": "notes.iut-nantes.univ-nantes.fr",
+    "Cookie": "PHPSESSID="+SESSIONID,//a remplacer par le cookie de la session
+    "Content-Length": "0",
+    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
+    }
+    const data = {}
+    return (await axios.post(url,data,{headers})).data["config"].session
+}
+
 async function GetGrade(ClientID,SESSIONID){
-    if (ClientID == undefined){
+    if (ClientID == undefined || SESSIONID == undefined){
         throw "missing argument"
     }
     var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
@@ -182,6 +194,27 @@ async function SendNotif(ClientID){
     webpush.sendNotification(pushSubscription)
 }
 
+async function AddSessionNumber(ClientID,SessionNumber){
+    if (ClientID == undefined || SessionNumber == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    result.SessionNumber = createHash('sha256').update(SessionNumber).digest('hex');
+    await collection.updateOne({"_id" : new Mongo.ObjectId(ClientID)},{$set: {"SessionNumber": result.SessionNumber}})
+}
+
+async function GetSessionNumber(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    return result.SessionNumber
+}
+
 module.exports = {
     getNode,
     createUser,
@@ -195,4 +228,8 @@ module.exports = {
     GetTDData,
     AddNotifData,
     SendNotif,
+    AddSessionNumber,
+    GetSessionNumber,
+    createHash,
+    getSessionNumber,
 }

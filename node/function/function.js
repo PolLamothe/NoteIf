@@ -129,7 +129,6 @@ async function GetGrade(ClientID,SESSIONID){
     try {
         moyenne = (await axios.post(url, data, { headers })).data["relevé"]["semestre"].notes.value
     }catch(e){
-        await RemoveSessionID(ClientID)
         return false
     }
     return createHash('sha256').update(moyenne).digest('hex');
@@ -215,6 +214,65 @@ async function GetSessionNumber(ClientID){
     return result.SessionNumber
 }
 
+async function SetAllTDUserTrue(ClientID,nomPromo,NuméroTD){
+    if(ClientID == undefined || nomPromo == undefined || NuméroTD == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.findOne({"NomPromo" : nomPromo,"NuméroGroupe":NuméroTD})
+    result = result.Client
+    for(i=0;i<result.length;i++){
+        if(result[i] != ClientID){
+            SetUserToTrue(result[i])
+        }   
+    }
+}
+
+async function SetUserToTrue(ClientID){
+    if(ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    await collection.updateOne({"_id" : new Mongo.ObjectId(ClientID)},{$set: {"NouvelleNote": true}})
+}
+
+async function SendNotifToGroupe(ClientID,nomPromo,NuméroTD){
+    if (nomPromo == undefined || NuméroTD == undefined || ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.findOne({"NomPromo" : nomPromo,"NuméroGroupe":NuméroTD})
+    result = result.Client
+    for(i=0;i<result.length;i++){
+        if (result[i] != ClientID){
+            SendNotif(result[i])
+        }
+    }
+}
+
+async function GetStoredGrade(ClientID,nomPromo,NuméroTD){
+    if(ClientID == undefined || nomPromo == undefined || NuméroTD == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.findOne({"NomPromo" : nomPromo,"NuméroGroupe":NuméroTD})
+    return result.AllNoteHash[ClientID]
+}
+
+async function IsUserAwared(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    return !result.NouvelleNote
+}
+
 module.exports = {
     getNode,
     createUser,
@@ -232,4 +290,9 @@ module.exports = {
     GetSessionNumber,
     createHash,
     getSessionNumber,
+    SetUserToTrue,
+    SetAllTDUserTrue,
+    SendNotifToGroupe,
+    GetStoredGrade,
+    IsUserAwared,
 }

@@ -16,14 +16,21 @@ module.exports = function (app,fonction) {
             if (await fonction.GetSessionNumber(req.body.ClientID) == undefined){
                 await fonction.AddSessionNumber(req.body.ClientID,sessionNumber)
             }
-            if (await fonction.GetSessionNumber(req.body.ClientID) == fonction.createHash("sha256").update(sessionNumber).digest("hex")){
-                await fonction.StoreNewGrade(req.body.ClientID,await fonction.GetGrade(req.body.ClientID,req.body.SESSIONID))
+            if (await fonction.GetSessionNumber(req.body.ClientID) == await fonction.createHash("sha256").update(sessionNumber).digest("hex")){
+                var groupe = await fonction.GetUserTDAndPromo(req.body.ClientID)
+                if (await fonction.GetGrade(req.body.ClientID,req.body.SESSIONID) != await fonction.GetStoredGrade(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)){
+                    await fonction.StoreNewGrade(req.body.ClientID,await fonction.GetGrade(req.body.ClientID,req.body.SESSIONID))
+                    if (await fonction.IsUserAwared(req.body.ClientID) == true){
+                        await fonction.SetAllTDUserTrue(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
+                        await fonction.SendNotifToGroupe(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
+                    }
+                }
                 res.send(true)
             }else{
                 throw "SessionID is not valid"
             }
         }catch(e){
-            console.log(e)
+            console.log(e,await fonction.createHash("sha256").update(sessionNumber).digest("hex"))
             res.send(false)
         }
     })

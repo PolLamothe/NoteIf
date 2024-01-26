@@ -273,6 +273,15 @@ async function IsUserAwared(ClientID){
     return !result.NouvelleNote
 }
 
+async function SetUserAsAwared(ClientID){
+    if (ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    await collection.updateOne({"_id" : new Mongo.ObjectId(ClientID)},{$set : {"NouvelleNote": false}})
+}
+
 module.exports = {
     getNode,
     createUser,
@@ -295,4 +304,5 @@ module.exports = {
     SendNotifToGroupe,
     GetStoredGrade,
     IsUserAwared,
+    SetUserAsAwared,
 }

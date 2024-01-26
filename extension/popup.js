@@ -85,6 +85,9 @@ async function getLocalID(){
     })
     return await LocalId
 }
+getLocalID().then((result)=>{
+    fetch(IP+"/SetAsAwared/"+result)
+})
 
 
 async function getNewID(Promo,TD){

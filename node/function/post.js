@@ -25,12 +25,13 @@ module.exports = function (app,fonction) {
                         await fonction.SendNotifToGroupe(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
                     }
                 }
+                await fonction.SetUserAsAwared(req.body.ClientID)
                 res.send(true)
             }else{
                 throw "SessionID is not valid"
             }
         }catch(e){
-            console.log(e,await fonction.createHash("sha256").update(sessionNumber).digest("hex"))
+            console.log(e)
             res.send(false)
         }
     })

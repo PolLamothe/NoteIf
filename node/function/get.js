@@ -8,13 +8,13 @@ module.exports = function (app,fonction) {
             res.send(false)
         }
     })
-    app.get('/SetAsAwared/:ID',async function(req,res){
+    app.get('/AmIAwared/:ID',async function(req,res){
         try{
-            await fonction.SetUserAsAwared(req.params.ID)   
-            res.send(true)
+            res.setHeader("Access-Control-Allow-Origin", "*")
+            res.send(await fonction.IsUserAwared(req.params.ID))
         }catch(e){
-            console.log(e)  
-            res.send(false)
+            console.log(e)
+            res.send(true)
         }
     })
 }

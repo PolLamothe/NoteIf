@@ -14,4 +14,9 @@ self.addEventListener('notificationclick', event => {
     event.waitUntil(
       self.registration.showNotification('Note If {}', options)
     );
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+          client.postMessage({ action: "newNote" });
+      });
+    });  
   });

@@ -85,9 +85,17 @@ async function getLocalID(){
     })
     return await LocalId
 }
-getLocalID().then((result)=>{
-    fetch(IP+"/SetAsAwared/"+result)
-})
+
+
+async function checkNotif(){
+    var response = await fetch(IP+"/AmIAwared/"+(await getLocalID()));
+    response = await response.json()
+    if(response == false){
+        chrome.browserAction.setIcon({path: "./img/notif_icon.png"})
+    }else{
+        chrome.browserAction.setIcon({path: "./img/icon_128.png"})
+    }
+}
 
 
 async function getNewID(Promo,TD){

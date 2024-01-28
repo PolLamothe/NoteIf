@@ -5,10 +5,18 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             await requestNotificationPermission()
         }
         chrome.cookies.get({"url":"https://notes.iut-nantes.univ-nantes.fr/","name":"PHPSESSID"}, async function(cookie) {
-            sendSESSIONID(await getLocalID(),cookie.value)
+            await sendSESSIONID(await getLocalID(),cookie.value)
+            checkNotif()
         })
     }
 })  
+
+self.addEventListener('message', event => {
+    if (event.data.action === "newNote") {
+        console.log('newNote')
+        checkNotif()
+    }
+});
 
 const IP = "http://localhost:3000"
 
@@ -28,6 +36,18 @@ async function sendSESSIONID(ClientID,SESSIONID){
     }
 }
 
+async function checkNotif(){
+    var response = await fetch(IP+"/AmIAwared/"+(await getLocalID()));
+    response = await response.json()
+    if(response == false){
+        chrome.browserAction.setIcon({path: "./img/notif_icon.png"})
+    }else{
+        chrome.browserAction.setIcon({path: "./img/icon_128.png"})
+    }
+}
+
+checkNotif()
+
 async function getLocalID(){
     var LocalId = new Promise((resolve,reject)=>{
         chrome.storage.local.get('id',(result)=>{
@@ -40,11 +60,9 @@ async function getLocalID(){
 async function isSubscribed(){
     var LocalId = new Promise((resolve,reject)=>{
         chrome.storage.local.get('subscribed',(result)=>{
-            console.log(result)
             resolve(result.subscribed)
         })
     })
-    console.log(await LocalId)
     return await LocalId
 }
 

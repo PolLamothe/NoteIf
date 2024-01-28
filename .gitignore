@@ -2,3 +2,4 @@ node/node_modules
 node/function/vapidKey.js
 
 .idea
+.DS_Store

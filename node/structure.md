@@ -32,7 +32,10 @@ SessionNumber est le numéro étudiant de l'utilisateur hashé en SHA-256, afin 
 	NuméroGroupe : int
 	Client : [ClientID]
     AllNoteHash : {
-        SESSIONID : NoteHash    
+        ClientID : NoteHash
+    }
+    AllDSHash : {
+        ClientID : AllDShash
     }
 }
 ```
@@ -41,7 +44,4 @@ Client contient tout les ClientID qui appartiennent à ce groupe
 
 NoteHash est un hash SHA-256 généré a partir des données les plus récentes concernant les notes de l'utilisateur, cela nous sert a savoir si une nouvelle note a étée publiée
 
-SESSIONID est une chaine de caractère utilisée par https://notes.iut-nantes.univ-nantes.fr/ comme "clé d'authentification" et qui va donc nous permettre de récupérer les notes d'un utilisateur
-AllSESSIONID est un object JSON contenant des SESSIONID de personne appartenant a ce groupe
-
-Le fait de stocker plusieurs SESSIONID est utile car cela rend le programme plus stable car si jamais un des SESSIONID ne fonctionne plus, les autres prendront le relais
+AllDSHash est un object JSON stockant pour chaque utilisateur, la somme des notes de DS hashée en SHA-256, cela nous servira a savoir si une note de DS a étée publiée et donc a prévenir toute la promo au lieu de juste le groupe de TD

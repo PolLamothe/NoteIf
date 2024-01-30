@@ -4,6 +4,7 @@ const Mongo = require('mongodb')
 const { createHash } = require('crypto')
 const webpush = require('web-push')
 var vapidKey = require("./vapidKey.js")
+const { error } = require("console")
 
 webpush.setVapidDetails(
     'mailto:',
@@ -16,28 +17,6 @@ const DBName = 'NoteIf'
 async function getClient(){
     const url = 'mongodb://127.0.0.1:27017'
     return await MongoClient.connect(url)
-}
-
-function getNode(){
-    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
-    const headers = {
-    "Host": "notes.iut-nantes.univ-nantes.fr",
-    "Cookie": "PHPSESSID=SESSIONPHP",//a remplacer par le cookie de la session
-    "Content-Length": "0",
-    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
-}
-    const data = {};
-
-    // Envoi de la requête POST
-    axios.post(url, data, { headers })
-        .then(response => {
-            // Traitement de la réponse
-            console.log(response.data["relevé"]);
-        })
-        .catch(error => {
-            // Gestion des erreurs
-            console.error('Erreur lors de la requête:', error.message);
-        });
 }
 
 async function createUser(NomPromo,NuméroGroupe){
@@ -73,7 +52,7 @@ async function createTD(NomPromo,NuméroGroupe){
     }
     var client = await getClient()
     var collection = client.db(DBName).collection('TD')
-    await collection.insertOne({NomPromo: NomPromo, NuméroGroupe: NuméroGroupe, Client: [],AllNoteHash:{}})
+    await collection.insertOne({NomPromo: NomPromo, NuméroGroupe: NuméroGroupe, Client: [],AllNoteHash:{},AllDSHash:{}})
 }
 
 async function addUser(NomPromo,NuméroGroupe,ClientID){
@@ -101,33 +80,23 @@ async function DoesUserExist(id){
     return false
 }
 
-async function getSessionNumber(SESSIONID){
-    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
-    const headers = {
-    "Host": "notes.iut-nantes.univ-nantes.fr",
-    "Cookie": "PHPSESSID="+SESSIONID,//a remplacer par le cookie de la session
-    "Content-Length": "0",
-    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
-    }
-    const data = {}
-    return (await axios.post(url,data,{headers})).data["config"].session
-}
-
-async function GetGrade(ClientID,SESSIONID){
-    if (ClientID == undefined || SESSIONID == undefined){
+async function getSessionNumber(ServerData){
+    if(ServerData == undefined){
         throw "missing argument"
     }
-    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
-    const headers = {
-    "Host": "notes.iut-nantes.univ-nantes.fr",
-    "Cookie": "PHPSESSID="+SESSIONID,//a remplacer par le cookie de la session
-    "Content-Length": "0",
-    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
+    try{
+        return await ServerData.config.session
+    }catch(e){
+        throw "error"
     }
-    const data = {}
-    var moyenne
+}
+
+async function GetGrade(ClientID,ServerData){
+    if (ClientID == undefined || ServerData == undefined){
+        throw "missing argument"
+    }
     try {
-        moyenne = (await axios.post(url, data, { headers })).data["relevé"]["semestre"].notes.value
+        moyenne = ServerData["relevé"]["semestre"].notes.value
     }catch(e){
         return false
     }
@@ -152,9 +121,6 @@ async function StoreNewGrade(ClientID,Grade){
     var collection = client.db(DBName).collection('TD')
     var group = await GetUserTDAndPromo(ClientID)
     group = await GetTDData(group.NomPromo,group.NuméroGroupe)
-    if (group.AllNoteHash[ClientID] != Grade){
-        console.log("new grade")
-    }
     group.AllNoteHash[ClientID] = Grade
     await collection.updateOne({"NomPromo" : group.NomPromo, "NuméroGroupe" : group.NuméroGroupe},{$set: {"AllNoteHash": group.AllNoteHash}})
 }
@@ -282,8 +248,94 @@ async function SetUserAsAwared(ClientID){
     await collection.updateOne({"_id" : new Mongo.ObjectId(ClientID)},{$set : {"NouvelleNote": false}})
 }
 
+async function getServerData(SESSIONID){
+    if(SESSIONID == null){
+        throw "missing argument"
+    }
+    var url = 'https://notes.iut-nantes.univ-nantes.fr/services/data.php?q=dataPremièreConnexion';
+    const headers = {
+    "Host": "notes.iut-nantes.univ-nantes.fr",
+    "Cookie": "PHPSESSID="+SESSIONID,//a remplacer par le cookie de la session
+    "Content-Length": "0",
+    "Origin": "https://notes.iut-nantes.univ-nantes.fr"
+    }
+    const data = {}
+    return await (await axios.post(url, data, { headers })).data
+}
+
+async function getDSHash(ServerData){
+    if(ServerData == undefined){
+        throw "missing argument"
+    }
+    try{
+        ServerData = ServerData.relevé.ressources
+        var sum = 0
+        for (const property in ServerData){
+            var currentRessource = ServerData[property]
+            for (i in currentRessource.evaluations){
+                var currentEval = currentRessource.evaluations[i]
+                if(currentEval.description == "DS"){
+                    if (currentEval.note.value != "~"){
+                        sum += currentEval.note.value
+                    }
+                }
+            }
+        }
+        return createHash("sha256").update(sum.toString()).digest("hex")
+    }catch(e){
+        console.log(e)
+        throw error
+    }
+}
+
+async function setAllPromoUserToTrue(ClientID,Promo){
+    if(Promo == undefined || ClientID == undefined){
+        throw "missing argument in setAllPromoUserToTrue"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.find({NomPromo : Promo}).toArray()
+    for (i in result){
+        SetAllTDUserTrue(ClientID,Promo,result[i].NuméroGroupe)
+    }
+}
+
+async function SendNotifToPromo(ClientID,Promo){
+    if(Promo == undefined || ClientID == undefined){
+        throw "missing argument in SendNotifToPromo"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.find({NomPromo : Promo}).toArray()
+    for (i in result){
+        SendNotifToGroupe(ClientID,Promo,result[i].NuméroGroupe)
+    }
+}
+
+async function GetLocalUserDSHash(ClientID){
+    if(ClientID == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var groupe = await GetUserTDAndPromo(ClientID)
+    var result = await collection.findOne({NomPromo : groupe.NomPromo,NuméroGroupe : groupe.NuméroGroupe})
+    return result.AllDSHash[ClientID]
+}
+
+async function UpdateDSHash(ClientID,DSHash){
+    if(ClientID == undefined || DSHash == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('TD')
+    var groupe = await GetUserTDAndPromo(ClientID)
+    var result = await collection.findOne({NomPromo : groupe.NomPromo,NuméroGroupe : groupe.NuméroGroupe})
+    result.AllDSHash[ClientID] = DSHash
+    await collection.updateOne({NomPromo : groupe.NomPromo,NuméroGroupe : groupe.NuméroGroupe},{$set : {AllDSHash : result.AllDSHash}})
+}
+
 module.exports = {
-    getNode,
     createUser,
     doesTDExist,
     createTD,
@@ -305,4 +357,10 @@ module.exports = {
     GetStoredGrade,
     IsUserAwared,
     SetUserAsAwared,
+    getServerData,
+    getDSHash,
+    setAllPromoUserToTrue,
+    SendNotifToPromo,
+    GetLocalUserDSHash,
+    UpdateDSHash,
 }

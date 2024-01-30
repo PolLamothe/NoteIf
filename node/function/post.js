@@ -12,18 +12,28 @@ module.exports = function (app,fonction) {
     app.post('/sendSessionID',async function(req,res){
         try{
             res.setHeader("Access-Control-Allow-Origin", "*")
-            var sessionNumber = await fonction.getSessionNumber(req.body.SESSIONID)
+            var serverData = await fonction.getServerData(req.body.SESSIONID)
+            var sessionNumber = await fonction.getSessionNumber(serverData)
             if (await fonction.GetSessionNumber(req.body.ClientID) == undefined){
                 await fonction.AddSessionNumber(req.body.ClientID,sessionNumber)
             }
-            if (await fonction.GetSessionNumber(req.body.ClientID) == await fonction.createHash("sha256").update(sessionNumber).digest("hex")){
+            if (await fonction.GetSessionNumber(req.body.ClientID) == await fonction.createHash("sha256").update(sessionNumber).digest("hex")){ //si le nom d'utilisateur de sessionID est le même que celui dui sessionID
                 var groupe = await fonction.GetUserTDAndPromo(req.body.ClientID)
-                if (await fonction.GetGrade(req.body.ClientID,req.body.SESSIONID) != await fonction.GetStoredGrade(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)){
-                    await fonction.StoreNewGrade(req.body.ClientID,await fonction.GetGrade(req.body.ClientID,req.body.SESSIONID))
-                    if (await fonction.IsUserAwared(req.body.ClientID) == true){
-                        await fonction.SetAllTDUserTrue(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
-                        await fonction.SendNotifToGroupe(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
-                    }
+                if (await fonction.GetGrade(req.body.ClientID,serverData) != await fonction.GetStoredGrade(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)){//si la moyenne a changé
+                        await fonction.StoreNewGrade(req.body.ClientID,await fonction.GetGrade(req.body.ClientID,serverData))
+                        if (await fonction.IsUserAwared(req.body.ClientID) == true){ // Si l'utilisateur n'a pas de nouvelle note en attente
+                            if(await fonction.GetLocalUserDSHash(req.body.ClientID) == "error"){
+                                await fonction.UpdateDSHash(req.body.ClientID,await fonction.getDSHash(serverData))
+                            }
+                            if (await fonction.GetLocalUserDSHash(req.body.ClientID) == await fonction.getDSHash(serverData)){ //Si la somme des notes de DS n'a pas changé
+                                await fonction.SendNotifToGroupe(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
+                                await fonction.SetAllTDUserTrue(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
+                            }else{
+                                await fonction.SendNotifToPromo(req.body.ClientID,groupe.NomPromo)
+                                await fonction.UpdateDSHash(req.body.ClientID,await fonction.getDSHash(serverData))
+                                await fonction.setAllPromoUserToTrue(req.body.ClientID,groupe.NomPromo)
+                            }
+                        }
                 }
                 await fonction.SetUserAsAwared(req.body.ClientID)
                 res.send(true)

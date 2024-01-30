@@ -13,7 +13,6 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
 self.addEventListener('message', event => {
     if (event.data.action === "newNote") {
-        console.log('newNote')
         checkNotif()
     }
 });

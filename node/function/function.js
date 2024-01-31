@@ -159,7 +159,7 @@ async function SendNotif(ClientID){
         }
         webpush.sendNotification(pushSubscription)
     }catch(e){
-        throw "notification error" 
+        return false
     }
 }
 
@@ -339,6 +339,48 @@ async function UpdateDSHash(ClientID,DSHash){
     await collection.updateOne({NomPromo : groupe.NomPromo,NuméroGroupe : groupe.NuméroGroupe},{$set : {AllDSHash : result.AllDSHash}})
 }
 
+async function IsClientNumberAlreadyUsed(ClientNumber){
+    if(ClientNumber == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    console.log(createHash("sha256").update(ClientNumber).digest("hex"))
+    var result = await collection.findOne({"SessionNumber" : createHash("sha256").update(ClientNumber).digest("hex")})
+    if(result == null){
+        return false
+    }else{
+        return true
+    }
+}
+
+async function getIDFromNumber(ClientNumber){
+    if(ClientNumber == undefined){
+        throw "missing argument"
+    }
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var result = await collection.findOne({"SessionNumber" : createHash("sha256").update(ClientNumber).digest("hex")})
+    return result._id
+}
+
+async function deleteUser(ClientID){
+    if(ClientID == undefined){
+        throw "missing argument"
+    }
+    console.log(ClientID)
+    var client = await getClient()
+    var collection = client.db(DBName).collection('Client')
+    var group = await GetUserTDAndPromo(ClientID)
+    await collection.deleteMany({"_id" : new Mongo.ObjectId(ClientID)})
+    var collection = client.db(DBName).collection('TD')
+    var result = await collection.findOne({NomPromo : group.NomPromo,NuméroGroupe : group.NuméroGroupe})
+    delete result.AllNoteHash[ClientID]
+    delete result.AllDSHash[ClientID]
+    result.Client.splice(result.Client.indexOf(ClientID),1)
+    await collection.updateOne({NomPromo : group.NomPromo,NuméroGroupe : group.NuméroGroupe},{$set : {AllDSHash : result.AllDSHash,AllNoteHash : result.AllNoteHash,Client : result.Client}})
+}
+
 module.exports = {
     createUser,
     doesTDExist,
@@ -367,4 +409,7 @@ module.exports = {
     SendNotifToPromo,
     GetLocalUserDSHash,
     UpdateDSHash,
+    IsClientNumberAlreadyUsed,
+    deleteUser,
+    getIDFromNumber
 }

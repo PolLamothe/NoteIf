@@ -1,5 +1,7 @@
 node/node_modules
 node/function/vapidKey.js
 
+extension/node_modules
+
 .idea
 .DS_Store

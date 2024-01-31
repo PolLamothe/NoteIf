@@ -3,7 +3,7 @@
 
   "name": "Note If",
   "description": "NoteIf permet aux étudiants de l'IUT de nantes à être averti à chaque nouvelle note publiée sur leur bulletin",
-  "version": "1.0",
+  "version": "1.1",
   "permissions": [
     "cookies",
     "storage",
@@ -23,5 +23,12 @@
   "content_security_policy": "script-src 'self' https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js; object-src 'self'",
   "icons": {
     "128" : "img/icon_128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{0c1b5df7-e6e6-406e-b641-0a732f627caa}",
+      "strict_min_version": "42.0"
+    }
   }
+  
 }

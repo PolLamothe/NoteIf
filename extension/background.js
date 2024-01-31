@@ -11,10 +11,6 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     }
 })  
 
-navigator.serviceWorker.addEventListener("message", (event) => {
-   checkNotif();
-  });
-
 const IP = "http://localhost:3000"
 
 async function sendSESSIONID(ClientID,SESSIONID){
@@ -115,3 +111,10 @@ async function subscribeToPushNotifications(){
             console.error('Erreur lors de l\'abonnement aux notifications push:', error);
         })
 }}
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.addEventListener("message", (event) => {
+        checkNotif();
+       });
+}else{
+    console.log("serviceWorker not supported")
+}

@@ -151,12 +151,16 @@ async function SendNotif(ClientID){
     var client = await getClient()
     var collection = client.db(DBName).collection('Client')
     var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
-    result = result.notification
-    const pushSubscription = {
-        endpoint: result.endpoint,
-        keys: result.keys
+    try{
+        result = result.notification
+        const pushSubscription = {
+            endpoint: result.endpoint,
+            keys: result.keys
+        }
+        webpush.sendNotification(pushSubscription)
+    }catch(e){
+        throw "notification error" 
     }
-    webpush.sendNotification(pushSubscription)
 }
 
 async function AddSessionNumber(ClientID,SessionNumber){

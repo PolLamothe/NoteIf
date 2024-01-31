@@ -26,12 +26,12 @@ module.exports = function (app,fonction) {
                                 await fonction.UpdateDSHash(req.body.ClientID,await fonction.getDSHash(serverData))
                             }
                             if (await fonction.GetLocalUserDSHash(req.body.ClientID) == await fonction.getDSHash(serverData)){ //Si la somme des notes de DS n'a pas changé
-                                await fonction.SendNotifToGroupe(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
                                 await fonction.SetAllTDUserTrue(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
+                                await fonction.SendNotifToGroupe(req.body.ClientID,groupe.NomPromo,groupe.NuméroGroupe)
                             }else{
-                                await fonction.SendNotifToPromo(req.body.ClientID,groupe.NomPromo)
                                 await fonction.UpdateDSHash(req.body.ClientID,await fonction.getDSHash(serverData))
                                 await fonction.setAllPromoUserToTrue(req.body.ClientID,groupe.NomPromo)
+                                await fonction.SendNotifToPromo(req.body.ClientID,groupe.NomPromo)
                             }
                         }
                 }

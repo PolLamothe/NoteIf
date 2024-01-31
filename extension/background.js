@@ -11,11 +11,9 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     }
 })  
 
-self.addEventListener('message', event => {
-    if (event.data.action === "newNote") {
-        checkNotif()
-    }
-});
+navigator.serviceWorker.addEventListener("message", (event) => {
+   checkNotif();
+  });
 
 const IP = "http://localhost:3000"
 

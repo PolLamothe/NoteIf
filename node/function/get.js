@@ -1,4 +1,4 @@
-module.exports = function (app,fonction) {
+module.exports = function (app,fonction,monEmetteur) {
     app.get('/doesThisUserExist/:ID',async function(req,res){
         try{
             res.setHeader("Access-Control-Allow-Origin", "*")
@@ -17,11 +17,13 @@ module.exports = function (app,fonction) {
             res.send(true)
         }
     })
-    app.get("/testNotif/:ID",async function(req,res){
+    app.get("/waitForNotif/:ID",async function(req,res){
+        console.log("waitForNotif")
         try{
             res.setHeader("Access-Control-Allow-Origin", "*")
-            await fonction.SendNotif(req.params.ID)
-            res.send(true)
+            monEmetteur.once(req.params.ID, function() {
+                res.send(true)
+            });
         }catch(e){
             console.log(e)
             res.send(false)

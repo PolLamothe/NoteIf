@@ -144,13 +144,16 @@ async function AddNotifData(ClientID,endpoint,keys){
     await collection.updateOne({"_id" : new Mongo.ObjectId(ClientID)},{$set: {"notification":{"endpoint": endpoint, "keys": keys}}})
 }
 
-async function SendNotif(ClientID){
+async function SendNotif(ClientID,monEmetteur){
     if (ClientID == undefined){
         throw "missing argument"
     }
     var client = await getClient()
     var collection = client.db(DBName).collection('Client')
     var result = await collection.findOne({"_id" : new Mongo.ObjectId(ClientID)})
+    if(monEmetteur != undefined){
+        monEmetteur.emit(ClientID)
+    }
     try{
         result = result.notification
         const pushSubscription = {

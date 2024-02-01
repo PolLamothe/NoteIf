@@ -111,10 +111,22 @@ async function subscribeToPushNotifications(){
             console.error('Erreur lors de l\'abonnement aux notifications push:', error);
         })
 }}
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.addEventListener("message", (event) => {
-        checkNotif();
-       });
-}else{
-    console.log("serviceWorker not supported")
+
+async function checkServiceWorker(){
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.addEventListener("message", (event) => {
+            checkNotif();
+           });
+    }else{
+        console.log("serviceWorker not in navigator")
+        while(true){
+            await fetch(IP+"/waitForNotif/"+(await getLocalID()))
+            await checkNotif()
+            let notif = new Notification('Vous avez une nouvelle note !', {
+                body: "Une nouvelle note a étée publié sur notes.iut-nantes.univ-nantes.fr",
+            });
+        }
+    }
 }
+
+checkServiceWorker()

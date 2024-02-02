@@ -1,3 +1,5 @@
+var vapidKey = require("./vapidKey.js")
+
 module.exports = function (app,fonction,monEmetteur) {
     app.get('/doesThisUserExist/:ID',async function(req,res){
         try{
@@ -13,12 +15,10 @@ module.exports = function (app,fonction,monEmetteur) {
             res.setHeader("Access-Control-Allow-Origin", "*")
             res.send(await fonction.IsUserAwared(req.params.ID))
         }catch(e){
-            console.log(e)
             res.send(true)
         }
     })
     app.get("/waitForNotif/:ID",async function(req,res){
-        console.log("waitForNotif")
         try{
             res.setHeader("Access-Control-Allow-Origin", "*")
             monEmetteur.once(req.params.ID, function() {
@@ -26,6 +26,14 @@ module.exports = function (app,fonction,monEmetteur) {
             });
         }catch(e){
             console.log(e)
+            res.send(false)
+        }
+    })
+    app.get("/getPublicKey",async function(req,res){
+        try{
+            res.setHeader("Access-Control-Allow-Origin", "*")
+            res.send(vapidKey.publicKey)
+        }catch(e){
             res.send(false)
         }
     })

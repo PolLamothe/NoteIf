@@ -61,14 +61,14 @@ $('#registerValidate').on('click', async function() {
 const IP = "http://localhost:3000"
 
 async function UpdateClientID(){
-    await chrome.storage.local.get('id',(result)=>{
+    await chrome.storage.local.get('id',async(result)=>{
         if (result.id == undefined){
             $('#GlobalDiv').css('display','none')
             $('#NotRegisteredDiv').css('display','inherit')
         }else{
             $('#GlobalDiv').css('display','inherit')
             $('#NotRegisteredDiv').css('display','none')
-            if (!isIDValid(result.id)){
+            if (!await isIDValid(result.id)){
                 chrome.storage.local.clear()
             }
         }

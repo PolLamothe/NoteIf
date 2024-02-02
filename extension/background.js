@@ -1,7 +1,12 @@
 chrome.webNavigation.onCompleted.addListener(async function(details) {
     var targetUrl = "https://notes.iut-nantes.univ-nantes.fr/"
     if(details.url == targetUrl){
-        if (await isSubscribed() == undefined){
+        if (await isSubscribed() == undefined && "serviceWorker" in navigator) {
+            if (await getPublicKey() == undefined){
+                var response = await fetch(IP+"/getPublicKey");
+                response = await response.text()
+                await chrome.storage.local.set({'publicKey': response})
+            }
             await requestNotificationPermission()
         }
         chrome.cookies.get({"url":"https://notes.iut-nantes.univ-nantes.fr/","name":"PHPSESSID"}, async function(cookie) {
@@ -50,6 +55,15 @@ async function getLocalID(){
     return await LocalId
 }
 
+async function getPublicKey(){
+    var LocalId = new Promise((resolve,reject)=>{
+        chrome.storage.local.get('publicKey',(result)=>{
+            resolve(result.publicKey)
+        })
+    })
+    return await LocalId
+}
+
 async function isSubscribed(){
     var LocalId = new Promise((resolve,reject)=>{
         chrome.storage.local.get('subscribed',(result)=>{
@@ -89,7 +103,7 @@ async function subscribeToPushNotifications(){
             registration.pushManager
             .subscribe({
             userVisibleOnly: true,
-            applicationServerKey: "BFiJK1S0uoKcKLzesQYlJ6HBC9OQ0GdKdSnefZmSsaA0FjkfGyItKSuSTvngSpVRcXmS--0tzSlNhi_YzsgaJIU",
+            applicationServerKey: await getPublicKey(),
             })
             .then(async (sub) => {
                 console.log('starting function')

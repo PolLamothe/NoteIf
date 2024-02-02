@@ -8,7 +8,7 @@ const { error } = require("console")
 
 webpush.setVapidDetails(
     'mailto:',
-    "BFiJK1S0uoKcKLzesQYlJ6HBC9OQ0GdKdSnefZmSsaA0FjkfGyItKSuSTvngSpVRcXmS--0tzSlNhi_YzsgaJIU",
+    vapidKey.publicKey,
     vapidKey.privateKey
   );
 

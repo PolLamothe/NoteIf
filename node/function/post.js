@@ -18,7 +18,7 @@ module.exports = function (app,fonction,monEmetteur) {
                 if (await fonction.IsClientNumberAlreadyUsed(sessionNumber) == false){
                     await fonction.AddSessionNumber(req.body.ClientID,sessionNumber)
                 }else{
-                    //await fonction.deleteUser(await fonction.getIDFromNumber(sessionNumber))
+                    await fonction.deleteUser(await fonction.getIDFromNumber(sessionNumber))
                     await fonction.AddSessionNumber(req.body.ClientID,sessionNumber)
                 }
             }

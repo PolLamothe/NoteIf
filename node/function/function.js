@@ -72,8 +72,7 @@ async function DoesUserExist(id){
     }
     var client = await getClient()
     var collection = client.db(DBName).collection('Client')
-    var objectID = id
-    var result = await collection.findOne({"_id": objectID})
+    var result = await collection.findOne({"_id": new Mongo.ObjectId(id)})
     if (result != undefined){
         return true
     }

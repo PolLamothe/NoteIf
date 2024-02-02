@@ -49,7 +49,9 @@ create a `vapidKey.js` file in the `node/function` folder with this content :
 
 ```
 const privateKey = "YOUR_PRIVATE_KEY"
-const publicKey = "YOUR_PUBLIC_KEY
+const publicKey = "YOUR_PUBLIC_KEY"
+
+module.exports = {privateKey,publicKey}
 ```
 
 ### Tech Stack

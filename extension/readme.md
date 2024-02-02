@@ -18,4 +18,4 @@ To use this extension on firefox you will need to use [web-ext](https://github.c
 
 # How to import to Chrome
 
-to import the extension to chrome you'l just need to import the whole 'extension' folder
+to import the extension to chrome you just need to import the whole 'extension' folder

@@ -11,7 +11,7 @@ NoteIf est un projet open source qui sert aux étudiants de l'IUT de nantes à �
 # Installation
 *if you want to run it locally*
 
-In the node folder :
+In the node folder and in the extension folder:
 
 *install all the node modules required*
 ```
@@ -37,6 +37,19 @@ db.createCollection('TD')
 Then go back to the node folder and run this to start the server :
 ```
 nodemon server
+```
+
+# Vapid key
+
+to use the service worker system you need to use vapid key and so, generate them and make them accessible from the server
+
+generate your vapid key with this command : `./node/node_modules/.bin/web-push generate-vapid-keys`
+
+create a `vapidKey.js` file in the `node/function` folder with this content :
+
+```
+const privateKey = "YOUR_PRIVATE_KEY"
+const publicKey = "YOUR_PUBLIC_KEY
 ```
 
 ### Tech Stack

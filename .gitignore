@@ -3,5 +3,7 @@ node/function/vapidKey.js
 
 extension/node_modules
 
+extension/web-ext-artifacts/*.zip
+
 .idea
 .DS_Store

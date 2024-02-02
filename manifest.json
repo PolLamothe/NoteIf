@@ -3,7 +3,7 @@
 
   "name": "Note If",
   "description": "NoteIf permet aux étudiants de l'IUT de nantes à être averti à chaque nouvelle note publiée sur leur bulletin",
-  "version": "2",
+  "version": "3",
   "permissions": [
     "cookies",
     "storage",

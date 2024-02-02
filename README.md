@@ -1,59 +1,21 @@
+# How to import to Firefox
 
-<div align="center">
+## Without modification :
 
-![Note If { }](extension/img/logo_noteIf_banner.png)
+To import this extension on firefox you can use the **.xpi** file in the **web-ext-artifacs** folder
 
-![GitHub contributors](https://img.shields.io/github/contributors/PolLamothe/NoteIf?style=for-the-badge&logo=github&labelColor=%23152039&color=%23ffe34f)
-</div>
+[how to do it](https://wiki.mozilla.org/Installing_Extensions)
 
-NoteIf est un projet open source qui sert aux étudiants de l'IUT de nantes à être averti à chaque nouvelle note publiée sur leu bulletin.
+note: *An xpi file is a file encrypted with a mozzila api-key so if you made modifications to this extension it won't be implemented in your browser*
 
-# Installation
-*if you want to run it locally*
+---
 
-In the node folder and in the extension folder:
+## With modification :
 
-*install all the node modules required*
-```
-npm install
-```
+To use this extension on firefox you will need to use [web-ext](https://github.com/mozilla/web-ext) to build a firefox version of this extension
 
-Setup Mongodb :
+*refer to the web-next github page to know how*
 
-**run this command to connect to your local MONGODB**
-```
-mongosh
-```
-Once you'r connected to the mongodb database, run this to create the required database:
-```
-use NoteIf
-```
-Now that you are into this database, run these commands to create the required collections :
-```
-db.createCollection('Client')
-db.createCollection('TD')
-```
+# How to import to Chrome
 
-Then go back to the node folder and run this to start the server :
-```
-nodemon server
-```
-
-# Vapid key
-
-to use the service worker system you need to use vapid key and so, generate them and make them accessible from the server
-
-generate your vapid key with this command : `./node/node_modules/.bin/web-push generate-vapid-keys`
-
-create a `vapidKey.js` file in the `node/function` folder with this content :
-
-```
-const privateKey = "YOUR_PRIVATE_KEY"
-const publicKey = "YOUR_PUBLIC_KEY"
-
-module.exports = {privateKey,publicKey}
-```
-
-### Tech Stack
-+ Node JS
-+ Mongo DB
+to import the extension to chrome you just need to import the whole 'extension' folder

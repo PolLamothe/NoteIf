@@ -1,6 +1,8 @@
 node/node_modules
 node/function/vapidKey.js
 
+node_modules
+
 extension/node_modules
 
 extension/web-ext-artifacts/*.zip

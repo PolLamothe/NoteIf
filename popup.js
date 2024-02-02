@@ -58,7 +58,7 @@ $('#registerValidate').on('click', async function() {
     }
 })
 
-const IP = "http://127.0.0.1:3000"
+const IP = "http://193.70.0.212:3000"
 
 async function UpdateClientID(){
     await chrome.storage.local.get('id',async(result)=>{
